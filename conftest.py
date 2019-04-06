@@ -2,14 +2,12 @@ import pytest
 import requests
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def base_url():
     return "http://pulse-rest-testing.herokuapp.com"
 
 
-book_list = [{"title": "Mu-Mu", "author": "Ivan Turgenev"},
-             {"title": "Mu-Mu 2", "author": "Ivan Turgenev"},
-             {"title": "Mu-Mu 3", "author": "Ivan Turgenev"}]
+book_list = [{"title": "Mu-Mu", "author": "Ivan Turgenev"}]
 
 
 @pytest.fixture(params=book_list, ids=[str(x) for x in book_list])
@@ -20,8 +18,13 @@ def book_data(base_url, request):
         requests.delete(f"{base_url}/books/{book_data['id']}")
 
 
-# @pytest.fixture
-# def wrong_book_data():
-#     book_data = {"title": "Mu-Mu",
-#                  "author": ""}
-#     return book_data
+new_book_data_list = [{"title": "Newest Title", "author": "Newest Author"}]
+
+
+@pytest.fixture(params=new_book_data_list, ids=[str(x) for x in new_book_data_list])
+def new_book_data(base_url, request):
+    new_book_data = request.param
+    yield new_book_data
+    if 'id' in new_book_data:
+        requests.delete(f"{base_url}/books/{new_book_data['id']}")
+
